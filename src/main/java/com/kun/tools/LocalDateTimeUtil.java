@@ -1,7 +1,5 @@
 package com.kun.tools;
 
-import org.springframework.util.Assert;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -31,8 +29,7 @@ public class LocalDateTimeUtil {
      * @return 格式化后的字符串
      */
     public static String format(LocalDateTime dateTime, String pattern) {
-        Assert.notNull(dateTime, "datetime must not be null");
-        Assert.hasText(pattern, "pattern must not be empty");
+        AssertUtil.notNull("datetime and pattern must not be null", dateTime, pattern);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return dateTime.format(formatter);
     }
@@ -52,7 +49,7 @@ public class LocalDateTimeUtil {
      * @return 格式化后的字符串
      */
     public static String now(String pattern) {
-        Assert.hasText(pattern, "pattern must not be empty");
+        AssertUtil.notNull(pattern, "pattern must not be empty");
         return format(LocalDateTime.now(), pattern);
     }
 

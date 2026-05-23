@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.kun.annotation.TsvIndex;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
+//import org.springframework.core.convert.ConversionService;
+//import org.springframework.util.Assert;
+//import org.springframework.util.ReflectionUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,8 @@ public class TsvUtil {
      * @return 对象列表
      */
     public static <T> List<T> readTsv(File file, Class<T> tClass) {
-        Assert.notNull(file, "TSV file must exist");
-        Assert.notNull(tClass, "Target class must not be null");
+        AssertUtil.notNull(file, "TSV file must exist");
+        AssertUtil.notNull(tClass, "Target class must not be null");
         CsvMapper mapper = new CsvMapper();
         CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
         try {
@@ -91,40 +92,25 @@ public class TsvUtil {
                      NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
-            ReflectionUtils.doWithFields(tClass, field -> {
+
+            List<Field> fields = BeanUtil.getAllFields(tClass);
+            for (Field field : fields) {
                 TsvIndex annotation = field.getAnnotation(TsvIndex.class);
                 if (annotation != null) {
                     int index = annotation.index();
-                    Assert.isTrue(index <= row.length, "Index out of bounds for TSV row");
-                    ReflectionUtils.makeAccessible(field);
-                    Object convert = convertStringToFieldType(row[index], field.getType());
-                    field.set(obj, convert);
+                    AssertUtil.isTrue(index <= row.length,
+                            "Index out of bounds for TSV row");
+                    Object convert = TypeConvertUtil.convert(row[index], field.getType());
+                    try {
+                        field.set(obj, convert);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException("Failed to set field: " + field.getName(), e);
+                    }
                 }
-            });
+            }
             result.add(obj);
         }
         return result;
-    }
-
-    private static Object convertStringToFieldType(String value, Class<?> type) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        if (type == String.class) {
-            return value;
-        } else if (type == int.class || type == Integer.class) {
-            return Integer.parseInt(value);
-        } else if (type == long.class || type == Long.class) {
-            return Long.parseLong(value);
-        } else if (type == double.class || type == Double.class) {
-            return Double.parseDouble(value);
-        } else if (type == float.class || type == Float.class) {
-            return Float.parseFloat(value);
-        } else if (type == boolean.class || type == Boolean.class) {
-            return Boolean.parseBoolean(value);
-        } else {
-            throw new IllegalArgumentException("Unsupported field type: " + type);
-        }
     }
 
 }

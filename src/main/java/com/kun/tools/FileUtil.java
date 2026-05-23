@@ -1,12 +1,11 @@
 package com.kun.tools;
 
 import com.kun.enums.FileType;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileUtil {
@@ -20,7 +19,7 @@ public class FileUtil {
      * @param input 文件路径或者目录
      */
     public static File getFile(String input) {
-        Assert.hasLength(input, "File path must not be null or blank");
+        AssertUtil.notNull(input, "File path must not be null or blank");
         return new File(input);
     }
 
@@ -49,10 +48,10 @@ public class FileUtil {
     }
 
     private static List<File> listFilesAndDirs(File file, FileType fileType) {
-        Assert.isTrue(file.exists(), "Directory does not exist: " + file.getPath());
-        Assert.isTrue(file.isDirectory(), "Path is not a directory: " + file.getPath());
+        AssertUtil.isTrue(file.exists(), "Directory does not exist: " + file.getPath());
+        AssertUtil.isTrue(file.isDirectory(), "Path is not a directory: " + file.getPath());
         File[] files = file.listFiles();
-        if (ObjectUtils.isEmpty(files)) {
+        if (ObjectUtil.isEmpty(files)) {
             return List.of();
         }
         Stream<File> stream = Arrays.stream(files);
@@ -62,7 +61,7 @@ public class FileUtil {
         if (fileType == FileType.DIRECTORY) {
             stream = stream.filter(File::isDirectory);
         }
-        return stream.toList();
+        return stream.collect(Collectors.toList());
     }
 
 }
