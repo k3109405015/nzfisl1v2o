@@ -1,7 +1,9 @@
 package com.kun.tools;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class ObjectUtil {
@@ -40,4 +42,32 @@ public class ObjectUtil {
         return false;
     }
 
+    /**
+     * 判断对象是否“空 Bean”（所有字段均为 null）
+     *
+     * <p>判断规则：
+     * - 遍历对象所有字段（包含父类字段）
+     * - 任一字段值不为 null，则返回 false
+     * - 所有字段均为 null，则返回 true
+     *
+     * <p>说明：
+     * - 通过反射获取字段值
+     * - 不判断空字符串、空集合等“语义空值”
+     *
+     * @param obj 目标对象
+     * @return true：所有字段均为 null；false：存在非 null 字段
+     */
+    public static boolean isEmptyBean(Object obj) {
+        if (obj == null) {
+            return true;
+        }
+        List<Field> fields = BeanUtil.getAllFields(obj.getClass());
+        for (Field field : fields) {
+            Object value = BeanUtil.getFieldValue(obj, field.getName());
+            if (value != null) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

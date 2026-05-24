@@ -101,20 +101,19 @@ public class BeanUtil {
     }
 
     /**
-     * 通过反射“爆破”获取对象字段值（仅当前类，不包含父类）
+     * 通过反射获取字段值（getter 优先，字段兜底）
      *
-     * <p>该方法绕过 getter/setter，直接访问字段值，适用于：
-     * <ul>
-     *     <li>仅支持当前类 declared field，不支持父类字段</li>
-     *     <li>会破坏封装性（private 可访问）</li>
-     *     <li>性能低于直接 getter 调用</li>
-     * </ul>
+     * <p>规则：
+     * 1. 优先调用 getter 方法获取值
+     * 2. getter 返回 null 时，再读取字段值
      *
-     * @param target    目标对象
-     * @param fieldName 字段名称
-     * @return 字段值（Object）
-     * @throws IllegalArgumentException 如果对象为空或字段不存在
-     * @throws RuntimeException         如果字段访问失败
+     * <p>说明：
+     * - 会绕过 private 访问限制
+     * - 反射调用性能低于普通方法调用
+     *
+     * @param target 目标对象（不能为空）
+     * @param fieldName 字段名
+     * @return 字段值或 getter 返回值
      */
     public static Object getFieldValue(Object target, String fieldName) {
         AssertUtil.notNull(target, "Target object cannot be null");

@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class TsvUtil {
 
     private TsvUtil() {
     }
+
+    private static final CsvMapper MAPPER = new CsvMapper();
 
     /**
      * 读取 TSV 文件并映射为 Java Bean 列表。
@@ -40,10 +43,9 @@ public class TsvUtil {
     public static <T> List<T> readTsv(File file, Class<T> tClass) {
         AssertUtil.notNull(file, "TSV file must exist");
         AssertUtil.notNull(tClass, "Target class must not be null");
-        CsvMapper mapper = new CsvMapper();
         CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
         try {
-            try (MappingIterator<T> it = mapper.readerFor(tClass).with(schema).readValues(file)) {
+            try (MappingIterator<T> it = MAPPER.readerFor(tClass).with(schema).readValues(file)) {
                 return it.readAll();
             }
         } catch (IOException e) {
@@ -67,6 +69,21 @@ public class TsvUtil {
     public static <T> List<T> readTsvRaw(File file, Class<T> tClass) {
         List<String[]> rows = readTsvRaw(file);
         return mapRows(rows, tClass);
+    }
+
+    /**
+     * 写 TSV 文件
+     */
+    public static <T> void writeTsv(List<T> data, Class<T> clazz, Path outFile) {
+        AssertUtil.notNull(data, "TSV data must exist");
+        AssertUtil.notNull(clazz, "Target class must not be null");
+        AssertUtil.notNull(outFile, "Output file must not be null");
+        CsvSchema schema = MAPPER.schemaFor(clazz).withHeader().withColumnSeparator('\t');
+        try {
+            MAPPER.writer(schema).writeValue(outFile.toFile(), data);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write TSV file: " + outFile, e);
+        }
     }
 
     private static List<String[]> readTsvRaw(File file) {
