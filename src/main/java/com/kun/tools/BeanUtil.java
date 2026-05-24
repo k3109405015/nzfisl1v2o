@@ -117,6 +117,7 @@ public class BeanUtil {
      */
     public static Object getFieldValue(Object target, String fieldName) {
         AssertUtil.notNull(target, "Target object cannot be null");
+        AssertUtil.notNull(fieldName, "Field name cannot be null");
         Class<?> clazz = target.getClass();
 
         // 优先尝试 getter
@@ -136,6 +137,12 @@ public class BeanUtil {
             throw new RuntimeException("Cannot access field '" + fieldName + "'", e);
         }
     }
+
+    public static <T> T getFieldValue(Object target, Field field, Class<T> tClass) {
+        Object value = getFieldValue(target, field.getName());
+        return tClass.cast(value);
+    }
+
 
     /**
      * 通过 getter 方法获取字段值。
