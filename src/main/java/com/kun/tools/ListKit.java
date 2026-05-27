@@ -2,6 +2,7 @@ package com.kun.tools;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -161,6 +162,34 @@ public class ListKit {
             sb.append(val).append("#");
         }
         return sb.toString();
+    }
+
+    public static <T> void markSelectedOrMax(List<T> list, Map<String, ?> selectedMap,
+                                             Function<Map<String, ?>, Boolean> firstCondition,
+                                             Function<T, String> keyGenerator,
+                                             Consumer<T> checkSetter, Runnable maxLevelSetter
+    ) {
+        if (ObjectUtil.isEmpty(list)) {
+            return;
+        }
+
+        if (firstCondition.apply(selectedMap)) {
+            maxLevelSetter.run();
+            return;
+        }
+
+        boolean matched = list.stream().anyMatch(item -> {
+            String key = keyGenerator.apply(item);
+            if (selectedMap.containsKey(key)) {
+                checkSetter.accept(item);
+                return true;
+            }
+            return false;
+        });
+
+        if (!matched) {
+            maxLevelSetter.run();
+        }
     }
 
 }
