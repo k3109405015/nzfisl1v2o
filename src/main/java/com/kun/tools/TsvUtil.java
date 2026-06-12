@@ -8,12 +8,11 @@ import com.kun.annotation.TsvIndex;
 //import org.springframework.util.Assert;
 //import org.springframework.util.ReflectionUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +71,24 @@ public class TsvUtil {
     }
 
     /**
+     * 读取无表头 TSV 文件并映射为 Java Bean 列表。
+     * 示例：
+     * 文件内容：
+     * a1    b1
+     * a2    b2
+     * readTsvRaw(file, Demo.class)
+     *
+     * @param file   TSV 文件（无表头）
+     * @param tClass 目标 Java 类型
+     * @param <T>    泛型类型
+     * @return 映射后的对象列表
+     */
+    public static <T> List<T> readTsvRaw(File file, Class<T> tClass, Charset charset) {
+        List<String[]> rows = readTsvRaw(file, charset);
+        return mapRows(rows, tClass);
+    }
+
+    /**
      * 写 TSV 文件
      */
     public static <T> void writeTsv(List<T> data, Class<T> clazz, Path outFile) {
@@ -87,8 +104,12 @@ public class TsvUtil {
     }
 
     private static List<String[]> readTsvRaw(File file) {
+        return readTsvRaw(file, StandardCharsets.UTF_8);
+    }
+
+    private static List<String[]> readTsvRaw(File file, Charset charset) {
         List<String[]> rows = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset))) {
             String line;
             while ((line = br.readLine()) != null) {
                 rows.add(line.split("\t", -1)); // -1 保留空列

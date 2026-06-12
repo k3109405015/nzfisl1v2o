@@ -5,10 +5,7 @@ import com.kun.annotation.TreeParentId;
 import com.kun.domain.TreeNode;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TreeUtil {
@@ -20,12 +17,17 @@ public class TreeUtil {
 
     private static final Map<Class<?>, Meta> CACHE = new ConcurrentHashMap<>();
 
+    public static <T> List<TreeNode<T>> build(List<T> list, Class<T> clazz, List<Long> hierarchy,
+                                              Map<Long, String> nameMap) {
+        return build(list, clazz, null, nameMap, hierarchy);
+    }
+
     public static <T> List<TreeNode<T>> build(List<T> list, Class<T> clazz, Map<Long, String> nameMap) {
-        return build(list, clazz, null, nameMap);
+        return build(list, clazz, null, nameMap, null);
     }
 
     private static <T> List<TreeNode<T>> build(List<T> list, Class<T> clazz, Long rootParentId,
-                                               Map<Long, String> nameMap) {
+                                               Map<Long, String> nameMap, List<Long> hierarchy) {
 
         AssertUtil.notNull(list, "nameMap must not be null");
         AssertUtil.notNull(clazz, "clazz must not be null");
@@ -66,6 +68,10 @@ public class TreeUtil {
             }
         }
 
+        if (!ObjectUtil.isEmpty(hierarchy)) {
+            return completeHierarchy(roots, hierarchy, nameMap);
+        }
+
         return roots;
     }
 
@@ -89,6 +95,34 @@ public class TreeUtil {
         }
 
         return meta;
+    }
+
+    public static <T> List<TreeNode<T>> completeHierarchy(
+            List<TreeNode<T>> roots, List<Long> hierarchy, Map<Long, String> nameMap) {
+
+        TreeNode<T> currentRoot = roots.get(0);
+
+        if (ObjectUtil.isEmpty(currentRoot.getParentId())) {
+            return roots;
+        }
+        int index = hierarchy.indexOf(currentRoot.getParentId());
+
+        if (index == -1) {
+            return roots;
+        }
+
+        // 从父节点位置向上追溯，逐层构建完整的层级结构
+        for (int i = index; i >= 0; i--) {
+            Long id = hierarchy.get(i);
+            TreeNode<T> parent = new TreeNode<>();
+            parent.setId(id);
+            parent.setName(nameMap.get(id));
+            parent.getChildren().add(currentRoot);
+            currentRoot.setParentId(id);
+            currentRoot = parent;
+        }
+
+        return Collections.singletonList(currentRoot);
     }
 
 }

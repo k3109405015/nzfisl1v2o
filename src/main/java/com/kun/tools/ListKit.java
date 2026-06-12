@@ -164,6 +164,39 @@ public class ListKit {
         return sb.toString();
     }
 
+    /**
+     * 根据 selectedMap 对列表进行“选中标记”或“兜底标记最大等级”的处理。
+     *
+     * <p>执行逻辑如下：</p>
+     * <ol>
+     *     <li>如果 list 为空，直接返回</li>
+     *     <li>先判断 firstCondition（全局优先条件）：
+     *         <ul>
+     *             <li>如果成立，直接执行 maxLevelSetter 并返回</li>
+     *         </ul>
+     *     </li>
+     *     <li>否则遍历 list：
+     *         <ul>
+     *             <li>通过 keyGenerator 生成 key</li>
+     *             <li>如果 selectedMap 包含该 key，则执行 checkSetter 标记该元素</li>
+     *         </ul>
+     *     </li>
+     *     <li>如果整个列表没有任何匹配项，则执行 maxLevelSetter 作为兜底逻辑</li>
+     * </ol>
+     *
+     * <p>典型应用场景：</p>
+     * <ul>
+     *     <li>命中集合优先标记逻辑</li>
+     *     <li>无命中时默认升级/标记最高等级</li>
+     * </ul>
+     *
+     * @param list           待处理的数据列表
+     * @param selectedMap    命中集合（key-value结构，仅使用 key）
+     * @param firstCondition 全局优先条件（满足则直接进入 max 逻辑）
+     * @param keyGenerator   从 T 对象中提取 key 的函数
+     * @param checkSetter    命中时对元素执行的标记操作（如 setSelected=true）
+     * @param maxLevelSetter 未命中任何元素时执行的兜底逻辑（如标记 max level）
+     */
     public static <T> void markSelectedOrMax(List<T> list, Map<String, ?> selectedMap,
                                              Function<Map<String, ?>, Boolean> firstCondition,
                                              Function<T, String> keyGenerator,
@@ -187,9 +220,69 @@ public class ListKit {
             return false;
         });
 
-        if (!matched) {
-            maxLevelSetter.run();
+    }
+
+    /**
+     * 从对象列表中提取某个字段
+     */
+    public static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
+        if (ObjectUtil.isEmpty(list)) {
+            return List.of();
         }
+        return list.stream().map(mapper).toList();
+    }
+
+    /**
+     * List 转 Map
+     *
+     * @param list      列表
+     * @param keyMapper key 提取函数
+     * @param <T>       元素类型
+     * @param <K>       key 类型
+     * @return Map<K, T>
+     */
+    public static <T, K> Map<K, T> toMap(List<T> list, Function<T, K> keyMapper) {
+        if (ObjectUtil.isEmpty(list)) {
+            return Map.of();
+        }
+        return list.stream().collect(Collectors.toMap(keyMapper, Function.identity()));
+    }
+
+    public static <T, K, V> Map<K, V> toMap(Collection<T> list, Function<T, K> keyMapper, Function<T, V> valueMapper) {
+        if (ObjectUtil.isEmpty(list)) {
+            return Map.of();
+        }
+        return list.stream().collect(Collectors.toMap(keyMapper, valueMapper));
+    }
+
+    public static <T> List<T> difference(List<T> a, List<T> b) {
+        if (ObjectUtil.isEmpty(a)) {
+            return List.of();
+        }
+        if (ObjectUtil.isEmpty(b)) {
+            return a;
+        }
+
+        Set<T> setB = new HashSet<>(b);
+
+        return a.stream().filter(e -> !setB.contains(e)).toList();
+    }
+
+    /**
+     * List 转 Map
+     *
+     * @param list      列表
+     * @param keyMapper key 提取函数
+     * @param <T>       元素类型
+     * @param <K>       key 类型
+     * @return Map<K, T>
+     */
+    public static <T, K> Map<K, T> toMap(List<T> list, Function<T, K> keyMapper, boolean override) {
+        if (ObjectUtil.isEmpty(list)) {
+            return Map.of();
+        }
+        return list.stream().collect(Collectors.toMap(keyMapper, Function.identity(),
+                (v1, v2) -> override ? v2 : v1));
     }
 
 }

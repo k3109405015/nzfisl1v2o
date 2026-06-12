@@ -28,7 +28,7 @@ public class ComplexExpressionEvaluator {
     /**
      * 表达式评估
      * <pre>
-     * Complex KRAS WildType && BRAF WildType
+     * Complex KRAS WildType 并且 BRAF WildType
      * </pre>
      *
      * @param hitSet       命中的集合
