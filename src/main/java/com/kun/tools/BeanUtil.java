@@ -11,6 +11,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Java Bean 工具类，提供属性读取、浅拷贝及字段反射访问能力。
+ *
+ * @author GaoYu
+ */
 public class BeanUtil {
 
     private BeanUtil() {
@@ -36,6 +41,16 @@ public class BeanUtil {
         }
     }
 
+    /**
+     * 将源对象的同名属性浅拷贝到目标类型的新实例中。
+     *
+     * <p>通过 JavaBean 的 getter/setter 进行属性复制，仅复制名称和类型均匹配的属性。</p>
+     *
+     * @param source 源对象
+     * @param clazz  目标类型
+     * @param <T>    目标类型泛型
+     * @return 拷贝后的新实例
+     */
     public static <T> T copy(Object source, Class<T> clazz) {
         AssertUtil.notNull("Source and clazz must not be null", source, clazz);
         T target;
@@ -89,11 +104,11 @@ public class BeanUtil {
                 // 直接赋值（浅拷贝核心）
                 writeMethod.invoke(target, value);
             } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new IllegalStateException(
-                        "Failed to copy property '" + sourcePd.getName()
-                                + "' from " + source.getClass().getName()
-                                + " to " + target.getClass().getName(), e
-                );
+//                throw new IllegalStateException(
+//                        "Failed to copy property '" + sourcePd.getName()
+//                                + "' from " + source.getClass().getName()
+//                                + " to " + target.getClass().getName(), e
+//                );
             }
         }
 
@@ -111,7 +126,7 @@ public class BeanUtil {
      * - 会绕过 private 访问限制
      * - 反射调用性能低于普通方法调用
      *
-     * @param target 目标对象（不能为空）
+     * @param target    目标对象（不能为空）
      * @param fieldName 字段名
      * @return 字段值或 getter 返回值
      */
@@ -138,6 +153,15 @@ public class BeanUtil {
         }
     }
 
+    /**
+     * 通过反射获取指定字段的值，并按目标类型转换后返回。
+     *
+     * @param target 目标对象
+     * @param field  字段对象
+     * @param tClass 返回值类型
+     * @param <T>    返回值泛型
+     * @return 字段值
+     */
     public static <T> T getFieldValue(Object target, Field field, Class<T> tClass) {
         Object value = getFieldValue(target, field.getName());
         return tClass.cast(value);
@@ -193,6 +217,52 @@ public class BeanUtil {
             current = current.getSuperclass();
         }
         return fieldMap.values().stream().toList();
+    }
+
+    /**
+     * 将 Java Bean 转换为 Map，键为字段名，值为字段值。
+     *
+     * <p>规则：</p>
+     * <ul>
+     *     <li>遍历类及其父类的所有字段（子类同名字段优先）</li>
+     *     <li>通过 {@link #getFieldValue(Object, String)} 取值（getter 优先，字段兜底）</li>
+     *     <li>仅写入非空且为简单类型的值（String、基本类型及其包装类）</li>
+     *     <li>跳过对象、集合、数组等复杂类型字段</li>
+     *     <li>使用 {@link LinkedHashMap} 保持字段顺序</li>
+     * </ul>
+     *
+     * @param obj 源对象
+     * @return 字段名到字段值的 Map；obj 为空时返回 null
+     */
+    public static Map<String, Object> objToMap(Object obj) {
+        if (ObjectUtil.isEmpty(obj)) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        List<Field> fields = getAllFields(obj.getClass());
+        for (Field field : fields) {
+            Object value = getFieldValue(obj, field.getName());
+            if (!ObjectUtil.isEmpty(value) && isSimpleValue(value)) {
+                map.put(field.getName(), value);
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 判断值是否为简单类型：String、基本类型及其包装类。
+     */
+    private static boolean isSimpleValue(Object value) {
+        Class<?> clazz = value.getClass();
+        return clazz == String.class
+                || clazz == Boolean.class
+                || clazz == Byte.class
+                || clazz == Short.class
+                || clazz == Integer.class
+                || clazz == Long.class
+                || clazz == Float.class
+                || clazz == Double.class
+                || clazz == Character.class;
     }
 
 }

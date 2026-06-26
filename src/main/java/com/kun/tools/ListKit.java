@@ -7,14 +7,24 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * List 集合操作工具类，提供转换、合并、分组、去重等常用能力。
+ *
+ * @author GaoYu
+ */
 public class ListKit {
 
     /**
      * List 对象转换（带单个增强逻辑）
      *
+     * <p>先将源元素浅拷贝为目标类型，再执行 consumer 进行额外赋值或增强。</p>
+     *
      * @param rows     源数据
      * @param clazz    目标类型
-     * @param consumer 可选增强逻辑（row -> entity）
+     * @param consumer 增强逻辑（row -> entity）
+     * @param <R>        源元素类型
+     * @param <E>        目标元素类型
+     * @return 转换后的列表；rows 为空时返回空列表
      */
     public static <R, E> List<E> convertList(List<R> rows, Class<E> clazz, BiConsumer<R, E> consumer) {
 
@@ -32,6 +42,14 @@ public class ListKit {
 
     /**
      * List 对象转换（无增强逻辑）
+     *
+     * <p>通过 {@link BeanUtil#copy(Object, Class)} 将源列表元素浅拷贝为目标类型。</p>
+     *
+     * @param rows  源数据
+     * @param clazz 目标类型
+     * @param <R>   源元素类型
+     * @param <E>   目标元素类型
+     * @return 转换后的列表；rows 为空时返回空列表
      */
     public static <R, E> List<E> convertList(List<R> rows, Class<E> clazz) {
 
@@ -49,6 +67,15 @@ public class ListKit {
      * - a 是基础数据
      * - b 是更新数据
      * - key 相同则 b 覆盖 a
+     *
+     * <p>要求 override 中每个元素的 key 必须存在于 base 中，否则抛出异常。</p>
+     *
+     * @param base         基础列表
+     * @param override     覆盖列表
+     * @param keyExtractor key 提取函数
+     * @param <T>            元素类型
+     * @param <K>            key 类型
+     * @return 合并后的列表；base 或 override 为空时返回空列表
      */
     public static <T, K> List<T> mergeOverrideByKey(
             List<T> base,
@@ -76,7 +103,16 @@ public class ListKit {
     }
 
     /**
-     * 合并
+     * 按 key 合并两个列表，b 覆盖 a 中同 key 元素。
+     *
+     * <p>与 {@link #mergeOverrideByKey(List, List, Function)} 不同，本方法不校验 b 的 key 是否存在于 a。</p>
+     *
+     * @param a            基础列表（不可为 null）
+     * @param b            覆盖列表
+     * @param keyExtractor key 提取函数
+     * @param <T>            元素类型
+     * @param <K>            key 类型
+     * @return 合并后的列表；b 为空时直接返回 a
      */
     public static <T, K> List<T> mergeWithOverrideByKey(List<T> a, List<T> b, Function<T, K> keyExtractor) {
         AssertUtil.notNull(a, "a list must not be null");
@@ -96,6 +132,13 @@ public class ListKit {
 
     /**
      * 多字段去重（按 key 组合）
+     *
+     * <p>将多个字段值拼接为组合 key，保留首次出现的元素。</p>
+     *
+     * @param list           源列表
+     * @param keyExtractors  字段提取函数（可变参数）
+     * @param <T>              元素类型
+     * @return 去重后的列表；list 为空时返回空列表
      */
     @SafeVarargs
     public static <T> List<T> distinctByKeys(List<T> list, Function<T, ?>... keyExtractors) {
@@ -109,7 +152,14 @@ public class ListKit {
     }
 
     /**
-     * 通用 groupBy，参数1 是list，参数2后面的，是方法引用，去重的Key
+     * 按多字段组合 key 对列表分组。
+     *
+     * <p>将多个字段值拼接为组合 key（{@code val1#val2#...}），相同 key 的元素归入同一组。</p>
+     *
+     * @param list           源列表
+     * @param keyExtractors  字段提取函数（可变参数）
+     * @param <T>              元素类型
+     * @return 分组 Map；list 为空时返回空 Map
      */
     @SafeVarargs
     public static <T> Map<String, List<T>> groupBy(List<T> list, Function<T, ?>... keyExtractors) {
@@ -132,6 +182,14 @@ public class ListKit {
      * <p>注意事项：</p>
      * <p>- 主对象类型由参数 3 指定</p>
      * <p>- 子集合使用 Set 存储，保证去重</p>
+     *
+     * @param groupMap  分组 Map（key 为分组标识，value 为同组元素列表）
+     * @param subClass  子对象类型
+     * @param filter    子对象过滤条件
+     * @param subSetter 子集合回填函数（主对象, 子对象 Set）
+     * @param <T>         主对象类型
+     * @param <S>         子对象类型
+     * @return 合并后的主对象列表；groupMap 为空时返回空列表
      */
     public static <T, S> List<T> mergeGroup(Map<String, List<T>> groupMap, Class<S> subClass,
                                             Predicate<T> filter,
@@ -154,6 +212,14 @@ public class ListKit {
 
     }
 
+    /**
+     * 将多个字段值拼接为组合 key，格式为 {@code val1#val2#...}。
+     *
+     * @param obj            源对象
+     * @param keyExtractors  字段提取函数（可变参数）
+     * @param <T>              元素类型
+     * @return 组合 key 字符串
+     */
     @SafeVarargs
     private static <T> String buildKey(T obj, Function<T, ?>... keyExtractors) {
         StringBuilder sb = new StringBuilder();
@@ -224,6 +290,12 @@ public class ListKit {
 
     /**
      * 从对象列表中提取某个字段
+     *
+     * @param list   源列表
+     * @param mapper 字段提取函数
+     * @param <T>    源元素类型
+     * @param <R>    目标字段类型
+     * @return 提取后的列表；list 为空时返回空列表
      */
     public static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
         if (ObjectUtil.isEmpty(list)) {
@@ -239,7 +311,7 @@ public class ListKit {
      * @param keyMapper key 提取函数
      * @param <T>       元素类型
      * @param <K>       key 类型
-     * @return Map<K, T>
+     * @return {@code Map<K, T>}
      */
     public static <T, K> Map<K, T> toMap(List<T> list, Function<T, K> keyMapper) {
         if (ObjectUtil.isEmpty(list)) {
@@ -248,6 +320,17 @@ public class ListKit {
         return list.stream().collect(Collectors.toMap(keyMapper, Function.identity()));
     }
 
+    /**
+     * List 转 Map（自定义 key 与 value）
+     *
+     * @param list        源集合
+     * @param keyMapper   key 提取函数
+     * @param valueMapper value 提取函数
+     * @param <T>           元素类型
+     * @param <K>           key 类型
+     * @param <V>           value 类型
+     * @return {@code Map<K, V>}；list 为空时返回空 Map
+     */
     public static <T, K, V> Map<K, V> toMap(Collection<T> list, Function<T, K> keyMapper, Function<T, V> valueMapper) {
         if (ObjectUtil.isEmpty(list)) {
             return Map.of();
@@ -255,6 +338,16 @@ public class ListKit {
         return list.stream().collect(Collectors.toMap(keyMapper, valueMapper));
     }
 
+    /**
+     * 求两个列表的差集（a 中存在但 b 中不存在的元素）。
+     *
+     * <p>使用 {@link Set#contains} 判断元素是否存在于 b，依赖元素的 {@code equals} 方法。</p>
+     *
+     * @param a 被减列表
+     * @param b 减数列表
+     * @param <T> 元素类型
+     * @return a - b；a 为空时返回空列表，b 为空时返回 a
+     */
     public static <T> List<T> difference(List<T> a, List<T> b) {
         if (ObjectUtil.isEmpty(a)) {
             return List.of();
@@ -269,13 +362,14 @@ public class ListKit {
     }
 
     /**
-     * List 转 Map
+     * List 转 Map，支持 key 冲突时的覆盖策略。
      *
      * @param list      列表
      * @param keyMapper key 提取函数
+     * @param override  key 冲突时是否用后者覆盖前者
      * @param <T>       元素类型
      * @param <K>       key 类型
-     * @return Map<K, T>
+     * @return {@code Map<K, T>}；list 为空时返回空 Map
      */
     public static <T, K> Map<K, T> toMap(List<T> list, Function<T, K> keyMapper, boolean override) {
         if (ObjectUtil.isEmpty(list)) {
