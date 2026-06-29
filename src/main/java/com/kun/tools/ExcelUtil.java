@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ExcelUtil {
 
+    /** 工具类，禁止实例化。 */
     private ExcelUtil() {
     }
 
@@ -33,10 +34,27 @@ public class ExcelUtil {
         return builder.sheet(sheetNo).doReadSync();
     }
 
+    /**
+     * 读取 Excel 第一个 sheet，使用默认字符集。
+     *
+     * @param filePath Excel 文件路径
+     * @param clazz    目标映射类型
+     * @param <T>      泛型类型
+     * @return 解析后的对象列表
+     */
     public static <T> List<T> readExcel(String filePath, Class<T> clazz) {
         return readExcel(filePath, clazz, 0, null);
     }
 
+    /**
+     * 读取 Excel 第一个 sheet，支持指定字符集。
+     *
+     * @param filePath Excel 文件路径
+     * @param clazz    目标映射类型
+     * @param charset  字符集
+     * @param <T>      泛型类型
+     * @return 解析后的对象列表
+     */
     public static <T> List<T> readExcel(String filePath, Class<T> clazz, CharsetEnum charset) {
         return readExcel(filePath, clazz, 0, charset);
     }

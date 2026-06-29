@@ -11,6 +11,7 @@ public class LocalDateTimeUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    /** 工具类，禁止实例化。 */
     private LocalDateTimeUtil() {
     }
 

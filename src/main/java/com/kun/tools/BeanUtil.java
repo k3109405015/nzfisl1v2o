@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  */
 public class BeanUtil {
 
+    /** 工具类，禁止实例化。 */
     private BeanUtil() {
     }
 
@@ -234,7 +235,7 @@ public class BeanUtil {
      * @param obj 源对象
      * @return 字段名到字段值的 Map；obj 为空时返回 null
      */
-    public static Map<String, Object> objToMap(Object obj) {
+    public static Map<String, Object> toMap(Object obj) {
         if (ObjectUtil.isEmpty(obj)) {
             return null;
         }

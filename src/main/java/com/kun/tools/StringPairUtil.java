@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 
 public class StringPairUtil {
 
+    /** 工具类，禁止实例化。 */
     private StringPairUtil() {
-
     }
 
     /**
@@ -28,6 +28,12 @@ public class StringPairUtil {
         return new AbstractMap.SimpleEntry<>(parts[0].trim(), parts[1].trim());
     }
 
+    /**
+     * 将 key=value 格式的字符串解析为键值对，默认分隔符为 {@code =}。
+     *
+     * @param input 输入字符串
+     * @return 键值对
+     */
     public static AbstractMap.SimpleEntry<String, String> toEntry(String input) {
         return toEntry(input, "=");
     }

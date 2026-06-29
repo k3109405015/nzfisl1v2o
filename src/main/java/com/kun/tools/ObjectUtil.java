@@ -8,10 +8,18 @@ import java.util.Map;
 
 public class ObjectUtil {
 
+    /** 工具类，禁止实例化。 */
     private ObjectUtil() {
-
     }
 
+    /**
+     * 判断对象是否为空。
+     *
+     * <p>支持 null、空字符串、空集合、空 Map、空数组。</p>
+     *
+     * @param obj 待判断对象
+     * @return true 表示为空
+     */
     public static boolean isEmpty(Object obj) {
 
         if (obj == null) {
@@ -40,6 +48,16 @@ public class ObjectUtil {
         }
 
         return false;
+    }
+
+    /**
+     * 判断对象是否非空。
+     *
+     * @param obj 待判断对象
+     * @return true 表示非空
+     */
+    public static boolean notEmpty(Object obj) {
+        return !isEmpty(obj);
     }
 
     /**

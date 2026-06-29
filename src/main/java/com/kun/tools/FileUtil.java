@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 public class FileUtil {
 
+    /** 工具类，禁止实例化。 */
     private FileUtil() {
     }
 
@@ -52,6 +53,13 @@ public class FileUtil {
         return files;
     }
 
+    /**
+     * 列出指定目录下的文件或子目录（包含目录自身）。
+     *
+     * @param file     目录
+     * @param fileType 类型过滤（文件、目录、所有）
+     * @return 文件或目录列表
+     */
     private static List<File> listFilesAndDirs(File file, FileType fileType) {
         AssertUtil.isTrue(file.exists(), "Directory does not exist: " + file.getPath());
         AssertUtil.isTrue(file.isDirectory(), "Path is not a directory: " + file.getPath());
@@ -78,7 +86,7 @@ public class FileUtil {
      * @throws IllegalArgumentException 如果 dirPath 为空或空白
      * @throws RuntimeException         如果创建目录失败（例如权限不足）
      */
-    public static Path ensureDirExists(String dirPath) {
+    public static Path createDirectoriesIfAbsent(String dirPath) {
         AssertUtil.notNull(dirPath, "dirPath cannot be null or blank");
         Path path = Paths.get(dirPath);
         try {

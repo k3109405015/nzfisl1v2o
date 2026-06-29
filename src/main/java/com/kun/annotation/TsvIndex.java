@@ -9,6 +9,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface TsvIndex {
 
+    /**
+     * TSV 列索引（从 0 开始）。
+     *
+     * @return 列索引
+     */
     int index();
 
 }

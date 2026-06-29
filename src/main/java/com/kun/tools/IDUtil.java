@@ -3,26 +3,15 @@ package com.kun.tools;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * ID 生成工具类。
- *
- * @author GaoYu
- */
 public class IDUtil {
 
     /**
-     * 生成短 ID：前缀 + 毫秒时间戳，经 Base64 URL-safe 编码后截取指定长度。
+     * 生成带前缀的短 ID。
      *
-     * <p>生成步骤：</p>
-     * <ol>
-     *     <li>时间格式：{@code yyyyMMddHHmmssSSS}（毫秒级）</li>
-     *     <li>拼接原始字符串：{@code prefix_timeStr}</li>
-     *     <li>Base64 URL-safe 编码</li>
-     *     <li>截取指定长度；若编码结果为空或长度不足，则返回完整编码串</li>
-     * </ol>
+     * <p>格式：{@code prefix_yyyyMMddHHmmssSSS} 经 Base64 URL-safe 编码后截取指定长度。</p>
      *
      * @param prefix  ID 前缀
-     * @param length  截取长度
+     * @param length  截取长度；若编码结果更短则返回完整编码
      * @return 短 ID 字符串
      */
     public static String genShortId(String prefix, int length) {

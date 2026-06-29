@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class TsvUtil {
 
+    /** 工具类，禁止实例化。 */
     private TsvUtil() {
     }
 

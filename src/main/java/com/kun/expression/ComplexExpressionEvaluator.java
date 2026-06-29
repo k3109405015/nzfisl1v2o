@@ -52,6 +52,13 @@ public class ComplexExpressionEvaluator {
         return (boolean) expression.evaluate(context);
     }
 
+    /**
+     * 表达式评估，默认移除 {@code Complex} 前缀。
+     *
+     * @param hitSet 命中的集合
+     * @param expr   原始表达式
+     * @return true 表示表达式命中，false 表示未命中
+     */
     public static boolean evaluate(Set<String> hitSet, String expr) {
         return evaluate(hitSet, expr, "Complex");
     }
