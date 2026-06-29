@@ -6,6 +6,9 @@ import com.kun.enums.CharsetEnum;
 
 import java.util.List;
 
+/**
+ * Excel 文件读取工具类，基于 EasyExcel 实现。
+ */
 public class ExcelUtil {
 
     /** 工具类，禁止实例化。 */
@@ -21,7 +24,7 @@ public class ExcelUtil {
      * @param filePath Excel 文件路径，不能为空
      * @param clazz    目标映射类型（Java Bean class），不能为空
      * @param sheetNo  指定读取的 sheet 页索引，从 0 开始，必须 ≥ 0
-     * @param charset
+     * @param charset  字符集，为 null 时使用默认字符集
      * @return 解析后的对象列表，如果 sheet 为空则返回空集合
      */
     public static <T> List<T> readExcel(String filePath, Class<T> clazz, Integer sheetNo, CharsetEnum charset) {

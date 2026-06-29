@@ -8,6 +8,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+/**
+ * HTTP 请求工具类，基于 {@link java.net.http.HttpClient} 封装 GET/POST 调用。
+ */
 public class HttpUtil {
 
     private static final HttpClient CLIENT;
@@ -24,6 +27,7 @@ public class HttpUtil {
      * @param url    请求地址
      * @param object 查询参数对象
      * @return HTTP 响应
+     * @throws Exception 请求发送或响应处理失败时抛出
      */
     public static HttpResponse<String> get(String url, Object object) throws Exception {
         return get(url, object, 10);
@@ -38,6 +42,7 @@ public class HttpUtil {
      * @param object  查询参数对象
      * @param timeout 超时时间（秒）
      * @return HTTP 响应
+     * @throws Exception 请求发送或响应处理失败时抛出
      */
     public static HttpResponse<String> get(String url, Object object, long timeout) throws Exception {
         return get(url, object, ContentTypeEnum.JSON, timeout);
@@ -53,6 +58,7 @@ public class HttpUtil {
      * @param contentType Content-Type
      * @param timeout     超时时间（秒）
      * @return HTTP 响应
+     * @throws Exception 请求发送或响应处理失败时抛出
      */
     public static HttpResponse<String> get(String url, Object object, ContentTypeEnum contentType, long timeout) throws Exception {
         url = url + StringUtil.buildGetUrl(object);
@@ -66,6 +72,7 @@ public class HttpUtil {
      * @param url    请求地址
      * @param object 请求体对象（序列化为 JSON）
      * @return HTTP 响应
+     * @throws Exception 请求发送或响应处理失败时抛出
      */
     public static HttpResponse<String> post(String url, Object object) throws Exception {
         return post(url, object, 10);
@@ -78,6 +85,7 @@ public class HttpUtil {
      * @param object  请求体对象（序列化为 JSON）
      * @param timeout 超时时间（秒）
      * @return HTTP 响应
+     * @throws Exception 请求发送或响应处理失败时抛出
      */
     public static HttpResponse<String> post(String url, Object object, long timeout) throws Exception {
         return post(url, object, ContentTypeEnum.JSON, timeout);
@@ -91,6 +99,7 @@ public class HttpUtil {
      * @param contentType Content-Type
      * @param timeout     超时时间（秒）
      * @return HTTP 响应
+     * @throws Exception 请求发送或响应处理失败时抛出
      */
     public static HttpResponse<String> post(String url, Object object, ContentTypeEnum contentType, long timeout) throws Exception {
         String json = getJson(url, object);

@@ -7,6 +7,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * List 集合操作工具类，提供转换、合并、分组、去重等常用能力。
+ */
 public class ListKit {
 
     /**
@@ -15,6 +18,9 @@ public class ListKit {
      * @param rows     源数据
      * @param clazz    目标类型
      * @param consumer 可选增强逻辑（row -> entity）
+     * @param <R>      源元素类型
+     * @param <E>      目标元素类型
+     * @return 转换后的列表
      */
     public static <R, E> List<E> convertList(List<R> rows, Class<E> clazz, BiConsumer<R, E> consumer) {
 
@@ -32,6 +38,12 @@ public class ListKit {
 
     /**
      * List 对象转换（无增强逻辑）
+     *
+     * @param rows  源数据
+     * @param clazz 目标类型
+     * @param <R>   源元素类型
+     * @param <E>   目标元素类型
+     * @return 转换后的列表
      */
     public static <R, E> List<E> convertList(List<R> rows, Class<E> clazz) {
 
@@ -49,6 +61,13 @@ public class ListKit {
      * - a 是基础数据
      * - b 是更新数据
      * - key 相同则 b 覆盖 a
+     *
+     * @param base          基础数据列表
+     * @param override      覆盖数据列表
+     * @param keyExtractor  key 提取函数
+     * @param <T>           元素类型
+     * @param <K>           key 类型
+     * @return 合并后的列表
      */
     public static <T, K> List<T> mergeOverrideByKey(
             List<T> base,
@@ -76,7 +95,14 @@ public class ListKit {
     }
 
     /**
-     * 合并
+     * 按 key 合并两个列表，b 中同 key 元素覆盖 a。
+     *
+     * @param a            基础列表
+     * @param b            覆盖列表
+     * @param keyExtractor key 提取函数
+     * @param <T>          元素类型
+     * @param <K>          key 类型
+     * @return 合并后的列表
      */
     public static <T, K> List<T> mergeWithOverrideByKey(List<T> a, List<T> b, Function<T, K> keyExtractor) {
         AssertUtil.notNull(a, "a list must not be null");
@@ -96,6 +122,11 @@ public class ListKit {
 
     /**
      * 多字段去重（按 key 组合）
+     *
+     * @param list           源列表
+     * @param keyExtractors  key 提取函数数组
+     * @param <T>            元素类型
+     * @return 去重后的列表
      */
     @SafeVarargs
     public static <T> List<T> distinctByKeys(List<T> list, Function<T, ?>... keyExtractors) {
@@ -110,6 +141,11 @@ public class ListKit {
 
     /**
      * 通用 groupBy，参数1 是list，参数2后面的，是方法引用，去重的Key
+     *
+     * @param list           源列表
+     * @param keyExtractors  key 提取函数数组
+     * @param <T>            元素类型
+     * @return 分组结果，key 为复合 key 字符串
      */
     @SafeVarargs
     public static <T> Map<String, List<T>> groupBy(List<T> list, Function<T, ?>... keyExtractors) {
@@ -132,6 +168,14 @@ public class ListKit {
      * <p>注意事项：</p>
      * <p>- 主对象类型由参数 3 指定</p>
      * <p>- 子集合使用 Set 存储，保证去重</p>
+     *
+     * @param groupMap  分组 Map，key 为分组标识
+     * @param subClass  子对象类型
+     * @param filter    子对象过滤条件
+     * @param subSetter 子集合回填函数
+     * @param <T>       主对象类型
+     * @param <S>       子对象类型
+     * @return 合并后的主对象列表
      */
     public static <T, S> List<T> mergeGroup(Map<String, List<T>> groupMap, Class<S> subClass,
                                             Predicate<T> filter,
@@ -232,6 +276,12 @@ public class ListKit {
 
     /**
      * 从对象列表中提取某个字段
+     *
+     * @param list   源列表
+     * @param mapper 字段映射函数
+     * @param <T>    源元素类型
+     * @param <R>    目标字段类型
+     * @return 映射后的列表
      */
     public static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
         if (ObjectUtil.isEmpty(list)) {
@@ -367,6 +417,7 @@ public class ListKit {
      *
      * @param list      列表
      * @param keyMapper key 提取函数
+     * @param override  是否允许 key 冲突时覆盖旧值
      * @param <T>       元素类型
      * @param <K>       key 类型
      * @return {@code Map<K, T>}

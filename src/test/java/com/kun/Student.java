@@ -1,5 +1,8 @@
 package com.kun;
 
+/**
+ * 学生实体类（测试用）。
+ */
 public class Student {
 
     private String name;

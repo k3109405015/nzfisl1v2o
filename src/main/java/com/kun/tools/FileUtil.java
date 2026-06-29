@@ -13,6 +13,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 文件与目录操作工具类。
+ */
 public class FileUtil {
 
     /** 工具类，禁止实例化。 */
@@ -23,6 +26,7 @@ public class FileUtil {
      * 获取一个File
      *
      * @param input 文件路径或者目录
+     * @return 对应的 {@link File} 对象
      */
     public static File getFile(String input) {
         AssertUtil.notNull(input, "File path must not be null or blank");
@@ -112,7 +116,7 @@ public class FileUtil {
         AssertUtil.notNull(dirPath, "dirPath cannot be null or blank");
         AssertUtil.notNull(prefix, "prefix cannot be null or blank");
         AssertUtil.notNull(suffix, "suffix cannot be null or blank");
-        Path dir = ensureDirExists(dirPath);
+        Path dir = createDirectoriesIfAbsent(dirPath);
         String fileName = prefix + "_" + LocalDateTimeUtil.now() + suffix;
         return dir.resolve(fileName);
     }

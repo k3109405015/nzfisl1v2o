@@ -3,6 +3,9 @@ package com.kun.tools;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * ID 生成工具类。
+ */
 public class IDUtil {
 
     /**

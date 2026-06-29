@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
+/**
+ * PDF 文本提取工具类，基于 Apache PDFBox 实现。
+ */
 public class PdfUtil {
 
     /**

@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
 
+/**
+ * 身份证号解析工具类，支持提取出生日期、性别与年龄。
+ */
 public class IdCardUtil {
 
     private static final int GENDER_INDEX = 16;
@@ -33,6 +36,7 @@ public class IdCardUtil {
      * - 第7~14位为出生日期（yyyyMMdd）
      *
      * @param idCard 18位身份证号
+     * @return 出生日期字符串（yyyyMMdd 格式）
      */
     public static String parseBirthDateString(String idCard) {
         AssertUtil.notNull(idCard, "idCard must not be empty");

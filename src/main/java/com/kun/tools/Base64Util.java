@@ -3,6 +3,9 @@ package com.kun.tools;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Base64 编码工具类。
+ */
 public class Base64Util {
 
     /**

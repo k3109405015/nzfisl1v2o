@@ -6,6 +6,11 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 通用树节点，支持挂载子节点与业务数据。
+ *
+ * @param <T> 节点关联的业务数据类型
+ */
 @Data
 @NoArgsConstructor
 public class TreeNode<T> {

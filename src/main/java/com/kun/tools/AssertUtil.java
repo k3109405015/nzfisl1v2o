@@ -1,9 +1,15 @@
 package com.kun.tools;
 
-
+/**
+ * 断言工具类
+ *
+ * @author kun
+ */
 public class AssertUtil {
 
-    /** 工具类，禁止实例化。 */
+    /**
+     * 工具类，禁止实例化。
+     */
     private AssertUtil() {
     }
 

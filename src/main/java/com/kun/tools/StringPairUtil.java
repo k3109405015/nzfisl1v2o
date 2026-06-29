@@ -3,6 +3,9 @@ package com.kun.tools;
 import java.util.AbstractMap;
 import java.util.regex.Pattern;
 
+/**
+ * 字符串键值对解析工具类。
+ */
 public class StringPairUtil {
 
     /** 工具类，禁止实例化。 */

@@ -2,6 +2,9 @@ package com.kun.tools;
 
 import com.alibaba.fastjson2.JSON;
 
+/**
+ * JSON 序列化与反序列化工具类，基于 Fastjson2 实现。
+ */
 public final class JsonUtil {
 
     /** 工具类，禁止实例化。 */

@@ -8,6 +8,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * 复杂表达式评估器，基于 JEXL 将命中集合与逻辑表达式进行匹配。
+ */
 public class ComplexExpressionEvaluator {
 
     // JEXL

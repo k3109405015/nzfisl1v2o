@@ -3,6 +3,9 @@ package com.kun.tools;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * {@link LocalDateTime} 格式化工具类。
+ */
 public class LocalDateTimeUtil {
 
     public static final DateTimeFormatter DATETIME_SECOND_FORMATTER =

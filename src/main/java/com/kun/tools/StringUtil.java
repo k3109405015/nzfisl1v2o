@@ -2,6 +2,9 @@ package com.kun.tools;
 
 import java.util.Map;
 
+/**
+ * 字符串处理工具类。
+ */
 public class StringUtil {
 
     /** 工具类，禁止实例化。 */
@@ -21,6 +24,9 @@ public class StringUtil {
 
     /**
      * 判断第一个字符是否为字母
+     *
+     * @param str 待判断字符串
+     * @return 首字符为字母时返回 true，空字符串返回 false
      */
     public static boolean isFirstCharLetter(String str) {
         return !ObjectUtil.isEmpty(str) && Character.isLetter(str.charAt(0));
@@ -28,15 +34,6 @@ public class StringUtil {
 
     /**
      * 将参数 Map 拼接为 GET 请求 URL。
-     *
-     * <p>例如：</p>
-     * <pre>
-     * params:
-     *   id=1
-     *   name=Tom
-     * 返回：
-     * ?id=1&name=Tom
-     * </pre>
      *
      * @param params 请求参数
      * @return 拼接后的 URL

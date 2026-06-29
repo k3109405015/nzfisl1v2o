@@ -2,6 +2,9 @@ package com.kun.domain;
 
 import lombok.Data;
 
+/**
+ * 类型转换键值对，由源类型与目标类型组成。
+ */
 @Data
 public final class TypePair {
 

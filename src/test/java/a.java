@@ -1,5 +1,8 @@
 import com.kun.tools.IDUtil;
 
+/**
+ * ID 生成测试入口类。
+ */
 public class a {
 
     /**

@@ -1,5 +1,11 @@
 package com.kun.service;
 
+/**
+ * 类型转换函数式接口。
+ *
+ * @param <S> 源类型
+ * @param <T> 目标类型
+ */
 @FunctionalInterface
 public interface Converter<S, T> {
 

@@ -6,6 +6,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Set 集合操作工具类。
+ */
 public class SetKit {
 
     /**

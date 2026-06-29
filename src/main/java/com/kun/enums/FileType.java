@@ -1,5 +1,10 @@
 package com.kun.enums;
 
+/**
+ * 文件类型枚举
+ *
+ * @author KUN
+ */
 public enum FileType {
     /**
      * 仅文件

@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 类型转换工具类，支持注册自定义 {@link Converter} 并进行类型转换。
+ */
 public class TypeConvertUtil {
 
     /**
@@ -59,6 +62,12 @@ public class TypeConvertUtil {
 
     /**
      * 类型转换
+     *
+     * @param source     源对象
+     * @param targetType 目标类型
+     * @param <T>        目标类型泛型
+     * @return 转换后的对象；source 为 null 时返回 null
+     * @throws IllegalArgumentException 找不到对应转换器时抛出
      */
     @SuppressWarnings("unchecked")
     public static <T> T convert(Object source, Class<T> targetType) {
@@ -96,6 +105,12 @@ public class TypeConvertUtil {
 
     /**
      * 注册转换器
+     *
+     * @param sourceType 源类型
+     * @param targetType 目标类型
+     * @param converter  转换函数
+     * @param <S>          源类型泛型
+     * @param <T>          目标类型泛型
      */
     public static <S, T> void register(Class<S> sourceType, Class<T> targetType,
                                        Converter<S, T> converter) {

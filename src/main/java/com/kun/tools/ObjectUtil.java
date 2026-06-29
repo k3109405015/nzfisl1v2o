@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 对象空值判断工具类。
+ */
 public class ObjectUtil {
 
     /** 工具类，禁止实例化。 */
