@@ -430,4 +430,13 @@ public class ListKit {
                 (v1, v2) -> override ? v2 : v1));
     }
 
+    public static <T, K> Map<K, List<T>> groupList(List<T> list,
+                                                   Function<T, K> keyExtractor) {
+        AssertUtil.notNull(keyExtractor, "keyExtractor can not be null");
+        if (ObjectUtil.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.groupingBy(keyExtractor));
+    }
+
 }

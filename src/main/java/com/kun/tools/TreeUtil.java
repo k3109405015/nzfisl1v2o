@@ -5,8 +5,10 @@ import com.kun.annotation.TreeParentId;
 import com.kun.domain.TreeNode;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 树形结构构建工具类。
@@ -184,6 +186,52 @@ public class TreeUtil {
         }
 
         return Collections.singletonList(currentRoot);
+    }
+
+    /**
+     * 获取指定 rootId 的所有子孙节点（BFS 广度优先）
+     *
+     * <p>实现逻辑：
+     * <ul>
+     *     <li>通过注解 TreeId 获取主键字段</li>
+     *     <li>通过注解 TreeParentId 获取父节点方法</li>
+     *     <li>构建 parentId -> children 分组结构</li>
+     *     <li>BFS 遍历整棵树</li>
+     * </ul>
+     *
+     * @param rootId 起始根节点 ID
+     * @param list   数据集合
+     * @param tClass 实体类型
+     * @return 所有子孙节点 ID
+     */
+    public static <T> List<Long> getAllChildren(Long rootId, List<T> list, Class<T> tClass) {
+
+        Field treeIdField = BeanUtil.getFieldByAnnotation(tClass, TreeId.class);
+        AssertUtil.notNull(treeIdField, "TreeId field not found");
+
+        Method treeParentMethod = BeanUtil.getMethodByAnnotation(tClass, TreeParentId.class);
+        AssertUtil.notNull(treeParentMethod, "TreeParentId field not found");
+
+        Map<Long, List<T>> group = list.stream()
+                .collect(Collectors.groupingBy(BeanUtil.toFunction(treeParentMethod, Long.class)));
+
+        Deque<Long> queue = new ArrayDeque<>();
+        queue.add(rootId);
+        List<Long> treeId = new ArrayList<>();
+        treeId.add(rootId);
+        while (ObjectUtil.notEmpty(queue)) {
+            Long parentId = queue.poll();
+            List<T> children = group.get(parentId);
+            if (ObjectUtil.isEmpty(children)) {
+                continue;
+            }
+            for (T child : children) {
+                Long id = BeanUtil.getFieldValue(child, treeIdField, Long.class);
+                treeId.add(id);
+                queue.add(id); // 继续往下找
+            }
+        }
+        return treeId;
     }
 
 }

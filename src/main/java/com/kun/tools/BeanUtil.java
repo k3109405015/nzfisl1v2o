@@ -1,9 +1,12 @@
 package com.kun.tools;
 
+import com.kun.annotation.TreeId;
+import com.kun.annotation.TreeParentId;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,7 +21,9 @@ import java.util.stream.Collectors;
  */
 public class BeanUtil {
 
-    /** 工具类，禁止实例化。 */
+    /**
+     * 工具类，禁止实例化。
+     */
     private BeanUtil() {
     }
 
@@ -248,6 +253,87 @@ public class BeanUtil {
             }
         }
         return map;
+    }
+
+    @SafeVarargs
+    public static List<Field> getFieldsByAnnotation(Class<?> clazz,
+                                                    Class<? extends Annotation>... annotationClasses) {
+        AssertUtil.notNull(clazz, "Class must not be null");
+        AssertUtil.notNull(annotationClasses, "Annotation classes must not be null");
+        Set<Class<? extends Annotation>> annotations = Set.of(annotationClasses);
+
+        return getAllFields(clazz).stream().filter(field -> {
+            return annotations.stream()
+                    .anyMatch(field::isAnnotationPresent);
+        }).toList();
+    }
+
+    /**
+     * 获取类中第一个匹配指定注解的字段
+     *
+     * @param clazz           目标类
+     * @param annotationClass 注解类型
+     * @return 命中的字段（不存在返回 null）
+     */
+    public static Field getFieldByAnnotation(Class<?> clazz,
+                                             Class<? extends Annotation> annotationClass) {
+        AssertUtil.notNull(clazz, "Class must not be null");
+        AssertUtil.notNull(annotationClass, "Annotation class must not be null");
+        return getAllFields(clazz).stream()
+                .filter(field -> field.isAnnotationPresent(annotationClass))
+                .findFirst().orElse(null);
+    }
+
+    /**
+     * 获取类中标注指定注解的 getter 方法
+     *
+     * <p>规则：
+     * <ul>
+     *     <li>先找到带注解的 Field</li>
+     *     <li>根据字段名推导 getter 方法名</li>
+     *     <li>仅支持 Java Bean 标准 getXxx</li>
+     * </ul>
+     *
+     * @param clazz           目标类
+     * @param annotationClass 注解类型
+     * @return getter Method
+     */
+    public static Method getMethodByAnnotation(Class<?> clazz,
+                                               Class<? extends Annotation> annotationClass) {
+        AssertUtil.notNull(clazz, "Class must not be null");
+        Field field = getFieldByAnnotation(clazz, annotationClass);
+        String getter = "get" + StringUtil.capitalize(field.getName());
+        try {
+            return clazz.getMethod(getter);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 将 Method 转换为 Function，便于 Stream 使用
+     *
+     * <p>用途：
+     * <ul>
+     *     <li>用于 groupingBy / map / filter 等 stream 操作</li>
+     *     <li>屏蔽反射细节</li>
+     * </ul>
+     *
+     * @param method 目标方法（getter）
+     * @param type   返回类型
+     * @param <T>    输入类型
+     * @param <R>    输出类型
+     * @return Function 包装器
+     */
+    public static <T, R> Function<T, R> toFunction(Method method, Class<R> type) {
+        method.setAccessible(true);
+        return t -> {
+            try {
+                return type.cast(method.invoke(t));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     /**
