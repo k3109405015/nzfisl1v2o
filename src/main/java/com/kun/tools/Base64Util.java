@@ -15,9 +15,7 @@ public class Base64Util {
      * @return URL安全Base64字符串
      */
     public static String encodeUrl(String raw) {
-        if (ObjectUtil.isEmpty(raw)) {
-            return null;
-        }
+        AssertUtil.notNull("raw must not be null", raw);
         return Base64.getUrlEncoder().withoutPadding()
                 .encodeToString(raw.getBytes(StandardCharsets.UTF_8));
     }
